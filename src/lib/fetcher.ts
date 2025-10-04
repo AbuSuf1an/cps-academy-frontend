@@ -12,10 +12,12 @@ export const fetcher = axios.create({
 // Request interceptor to add auth token
 fetcher.interceptors.request.use(
   config => {
-    // Add auth token if available
-    const token = localStorage.getItem('auth-token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Add auth token if available (only in browser environment)
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth-token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
