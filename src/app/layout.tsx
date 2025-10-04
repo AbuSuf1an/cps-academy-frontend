@@ -38,6 +38,7 @@ export const metadata: Metadata = {
 };
 
 import { Header } from '@/components/marketing/Header';
+import { Providers } from './providers';
 
 export default function RootLayout({
   children,
@@ -53,10 +54,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background font-sans`}
       >
-        <div className='relative flex min-h-screen flex-col'>
-          <Header />
-          <div className='flex-1'>{children}</div>
-        </div>
+        <Providers>
+          <div className='relative flex min-h-screen flex-col'>
+            <Header />
+            <div className='flex-1'>{children}</div>
+          </div>
+        </Providers>
       </body>
     </html>
   );

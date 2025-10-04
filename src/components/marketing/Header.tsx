@@ -1,12 +1,15 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Code, Menu, X } from 'lucide-react';
+import { Code, Menu, X, User } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { SignOutButton } from '@/components/auth/SignOutButton';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -49,12 +52,28 @@ export function Header() {
               About
             </Link>
             <div className='flex items-center space-x-2'>
-              <Button variant='ghost' size='sm' asChild>
-                <Link href='/auth/signin'>Sign In</Link>
-              </Button>
-              <Button size='sm' asChild>
-                <Link href='/auth/signup'>Get Started</Link>
-              </Button>
+              {status === 'loading' ? (
+                <div className='w-20 h-8 bg-gray-200 animate-pulse rounded'></div>
+              ) : session ? (
+                <>
+                  <Button variant='ghost' size='sm' asChild>
+                    <Link href='/dashboard'>
+                      <User className='mr-2 h-4 w-4' />
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <SignOutButton />
+                </>
+              ) : (
+                <>
+                  <Button variant='ghost' size='sm' asChild>
+                    <Link href='/login'>Sign In</Link>
+                  </Button>
+                  <Button size='sm' asChild>
+                    <Link href='/register'>Get Started</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
 
@@ -105,12 +124,28 @@ export function Header() {
                 About
               </Link>
               <div className='flex flex-col space-y-2 px-3 pt-2'>
-                <Button variant='ghost' size='sm' className='justify-start' asChild>
-                  <Link href='/auth/signin'>Sign In</Link>
-                </Button>
-                <Button size='sm' className='justify-start' asChild>
-                  <Link href='/auth/signup'>Get Started</Link>
-                </Button>
+                {session ? (
+                  <>
+                    <Button variant='ghost' size='sm' className='justify-start' asChild>
+                      <Link href='/dashboard' onClick={() => setIsMenuOpen(false)}>
+                        <User className='mr-2 h-4 w-4' />
+                        Dashboard
+                      </Link>
+                    </Button>
+                    <div onClick={() => setIsMenuOpen(false)}>
+                      <SignOutButton />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Button variant='ghost' size='sm' className='justify-start' asChild>
+                      <Link href='/login' onClick={() => setIsMenuOpen(false)}>Sign In</Link>
+                    </Button>
+                    <Button size='sm' className='justify-start' asChild>
+                      <Link href='/register' onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>
