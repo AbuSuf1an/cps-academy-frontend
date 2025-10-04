@@ -25,14 +25,48 @@ const authOptions = {
           const { jwt, user } = response.data;
 
           if (jwt && user) {
-            // Fetch user profile from Strapi /me endpoint
-            const profileResponse = await fetcher.get('/api/user-profiles/me', {
-              headers: {
-                Authorization: `Bearer ${jwt}`,
-              },
-            });
-
-            const { user: userData, profile } = profileResponse.data;
+            // Try to fetch user profile from Strapi /me endpoint
+            let userData = user;
+            let profile = null;
+            
+            try {
+              const profileResponse = await fetcher.get('/api/user-profiles/me', {
+                headers: {
+                  Authorization: `Bearer ${jwt}`,
+                },
+              });
+              
+              const profileData = profileResponse.data;
+              userData = profileData.user || user;
+              profile = profileData.profile;
+            } catch (profileError: any) {
+              console.log('Profile not found, creating one:', profileError?.response?.status);
+              
+              // If profile doesn't exist, create one as fallback
+              try {
+                const createProfileResponse = await fetcher.post('/api/user-profiles', {
+                  data: {
+                    role: 'NormalUser',
+                    displayName: user.username || user.email.split('@')[0],
+                    user: user.id,
+                  }
+                }, {
+                  headers: {
+                    Authorization: `Bearer ${jwt}`,
+                  },
+                });
+                
+                console.log('Profile created successfully');
+                profile = {
+                  id: createProfileResponse.data.data.id,
+                  role: 'NormalUser',
+                  displayName: user.username || user.email.split('@')[0],
+                };
+              } catch (createError: any) {
+                console.error('Failed to create profile:', createError?.response?.data);
+                // Still allow authentication even if profile creation fails
+              }
+            }
 
             return {
               id: user.id.toString(),
@@ -46,8 +80,10 @@ const authOptions = {
           }
 
           return null;
-        } catch (error) {
+        } catch (error: any) {
           console.error('Authentication error:', error);
+          console.error('Error response data:', error?.response?.data);
+          console.error('Error status:', error?.response?.status);
           return null;
         }
       },
