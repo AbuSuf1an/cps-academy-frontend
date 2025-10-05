@@ -1,11 +1,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Code, Menu, X, User } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { SignOutButton } from '@/components/auth/SignOutButton';
+import Image from 'next/image';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,10 +20,15 @@ export function Header() {
         <div className='flex h-16 items-center justify-between'>
           {/* Logo */}
           <Link href='/' className='flex items-center space-x-2'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary'>
-              <Code className='h-5 w-5 text-primary-foreground' />
-            </div>
-            <span className='text-xl font-bold'>CPS Academy</span>
+            <Image
+              src='/logo.png'
+              alt='CPS Academy logo'
+              width={475}
+              height={76}
+              quality={100}
+              priority
+              className='h-9 w-auto'
+            />
           </Link>
 
           {/* Desktop Navigation */}

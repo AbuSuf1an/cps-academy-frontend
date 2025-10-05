@@ -3,45 +3,26 @@
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import CourseCard from '@/components/courses/CourseCard';
-
-interface Course {
-  id: number;
-  slug: string;
-  title: string;
-  description: string;
-  level: string;
-  duration?: string;
-  price?: number;
-  thumbnail?: {
-    url: string;
-    alternativeText?: string;
-  };
-  modules?: Array<{
-    id: number;
-    title: string;
-    classes?: Array<{
-      id: number;
-      title: string;
-    }>;
-  }>;
-}
+import { strapiApi } from '@/lib/api';
+import { FlattenedCourse, transformers, CoursesResponse } from '@/lib/types';
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<FlattenedCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch('/api/courses');
-        if (!response.ok) {
-          throw new Error('Failed to fetch courses');
-        }
-        const data = await response.json();
-        setCourses(data.data || []);
+        const response = await strapiApi.getCourses();
+        const coursesData = response.data as CoursesResponse;
+        
+        // Transform Strapi data to flattened structure
+        const transformedCourses = coursesData.data.map(transformers.course);
+        setCourses(transformedCourses);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error fetching courses:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch courses');
       } finally {
         setLoading(false);
       }

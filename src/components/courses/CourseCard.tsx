@@ -2,36 +2,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, BookOpen } from 'lucide-react';
+import { Clock, Users, BookOpen, Play, Lock } from 'lucide-react';
+import { FlattenedCourse } from '@/lib/types';
 
 interface CourseCardProps {
-  course: {
-    id: number;
-    slug: string;
-    title: string;
-    description: string;
-    level: string;
-    duration?: string;
-    price?: number;
-    thumbnail?: {
-      url: string;
-      alternativeText?: string;
-    };
-    modules?: Array<{
-      id: number;
-      title: string;
-      classes?: Array<{
-        id: number;
-        title: string;
-      }>;
-    }>;
-  };
+  course: FlattenedCourse;
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-  const totalClasses = course.modules?.reduce((total, module) => {
-    return total + (module.classes?.length || 0);
-  }, 0) || 0;
+  const totalClasses = course.modules.reduce((total, module) => {
+    return total + module.classes.length;
+  }, 0);
+
+  const freePreviewCount = course.modules.reduce((total, module) => {
+    return total + module.classes.filter(classItem => classItem.isFreePreview).length;
+  }, 0);
 
   const thumbnailUrl = course.thumbnail?.url 
     ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${course.thumbnail.url}`
@@ -48,14 +33,25 @@ export default function CourseCard({ course }: CourseCardProps) {
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          {course.level && (
-            <Badge 
-              className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm"
-              variant="default"
-            >
-              {course.level}
-            </Badge>
-          )}
+          <div className="absolute top-2 right-2 flex flex-col gap-1">
+            {course.level && (
+              <Badge 
+                className="bg-primary/90 backdrop-blur-sm"
+                variant="default"
+              >
+                {course.level}
+              </Badge>
+            )}
+            {freePreviewCount > 0 && (
+              <Badge 
+                className="bg-green-500/90 backdrop-blur-sm text-white"
+                variant="default"
+              >
+                <Play className="h-3 w-3 mr-1" />
+                {freePreviewCount} Free
+              </Badge>
+            )}
+          </div>
         </div>
         
         <CardHeader>
@@ -84,10 +80,10 @@ export default function CourseCard({ course }: CourseCardProps) {
                 </div>
               )}
               
-              {course.duration && (
+              {course.estimatedDuration && (
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  <span>{course.duration}</span>
+                  <span>{course.estimatedDuration}</span>
                 </div>
               )}
             </div>
