@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { 
   Code2, 
@@ -39,7 +38,6 @@ interface FeatureFlag {
 }
 
 export default function DeveloperDashboard() {
-  const { data: session } = useSession();
   const [systemStatus, setSystemStatus] = useState<SystemStatus[]>([]);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [loading, setLoading] = useState(true);

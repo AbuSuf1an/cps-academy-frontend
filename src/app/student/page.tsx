@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { 
   BookOpen, 
@@ -83,7 +82,6 @@ export default function StudentDashboard() {
 
   const completedCourses = enrolledCourses.filter(course => course.progress === 100);
   const inProgressCourses = enrolledCourses.filter(course => course.progress > 0 && course.progress < 100);
-  const notStartedCourses = enrolledCourses.filter(course => course.progress === 0);
 
   const getProgressColor = (progress: number) => {
     if (progress === 100) return 'bg-green-500';

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { 
   BookOpen, 
@@ -38,7 +37,6 @@ interface Stats {
 }
 
 export default function ManagerDashboard() {
-  const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<CourseAnalytics[]>([]);
   const [stats, setStats] = useState<Stats>({
